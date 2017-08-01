@@ -83,11 +83,11 @@ func (c Client) ImagesService() *vision.ImagesService {
 }
 
 // NewBatchAnnotateImageRequest returns a pointer to a new vision's BatchAnnotateImagesRequest.
-func (c Client) NewBatchAnnotateImageRequest(list []string, features ...*vision.Feature) (*vision.BatchAnnotateImagesRequest, error) {
+func (c Client) NewBatchAnnotateImageRequest(list []string, ctx *vision.ImageContext, features ...*vision.Feature) (*vision.BatchAnnotateImagesRequest, error) {
 	batch := &vision.BatchAnnotateImagesRequest{}
 	batch.Requests = []*vision.AnnotateImageRequest{}
 	for _, v := range list {
-		req, err := c.NewAnnotateImageRequest(v, features...)
+		req, err := c.NewAnnotateImageRequest(v, ctx, features...)
 		if err != nil {
 			return nil, err
 		}
@@ -97,11 +97,11 @@ func (c Client) NewBatchAnnotateImageRequest(list []string, features ...*vision.
 }
 
 // NewAnnotateImageRequest returns a pointer to a new vision's AnnotateImagesRequest.
-func (c Client) NewAnnotateImageRequest(v interface{}, features ...*vision.Feature) (*vision.AnnotateImageRequest, error) {
+func (c Client) NewAnnotateImageRequest(v interface{}, ctx *vision.ImageContext, features ...*vision.Feature) (*vision.AnnotateImageRequest, error) {
 	switch v.(type) {
 	case []byte:
 		// base64
-		return NewAnnotateImageContentRequest(v.([]byte), features...)
+		return NewAnnotateImageContentRequest(v.([]byte), ctx, features...)
 	case string:
 		u, err := url.Parse(v.(string))
 		if err != nil {
@@ -112,7 +112,7 @@ func (c Client) NewAnnotateImageRequest(v interface{}, features ...*vision.Featu
 			// GcsImageUri: Google Cloud Storage image URI. It must be in the
 			// following form:
 			// "gs://bucket_name/object_name". For more
-			return NewAnnotateImageSourceRequest(u.String(), features...)
+			return NewAnnotateImageSourceRequest(u.String(), ctx, features...)
 		case "http", "https":
 			httpClient := c.config.HTTPClient
 			if httpClient == nil {
@@ -130,23 +130,24 @@ func (c Client) NewAnnotateImageRequest(v interface{}, features ...*vision.Featu
 			if err != nil {
 				return nil, err
 			}
-			return c.NewAnnotateImageRequest(body, features...)
+			return c.NewAnnotateImageRequest(body, ctx, features...)
 		}
 		// filepath
 		b, err := ioutil.ReadFile(v.(string))
 		if err != nil {
 			return nil, err
 		}
-		return c.NewAnnotateImageRequest(b, features...)
+		return c.NewAnnotateImageRequest(b, ctx, features...)
 	}
 	return &vision.AnnotateImageRequest{}, nil
 }
 
 // NewAnnotateImageContentRequest returns a pointer to a new vision's AnnotateImagesRequest.
-func NewAnnotateImageContentRequest(body []byte, features ...*vision.Feature) (*vision.AnnotateImageRequest, error) {
+func NewAnnotateImageContentRequest(body []byte, ctx *vision.ImageContext, features ...*vision.Feature) (*vision.AnnotateImageRequest, error) {
 	req := &vision.AnnotateImageRequest{
-		Image:    NewAnnotateImageContent(body),
-		Features: features,
+		Image:        NewAnnotateImageContent(body),
+		ImageContext: ctx,
+		Features:     features,
 	}
 	return req, nil
 }
