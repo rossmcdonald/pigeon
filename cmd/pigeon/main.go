@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kaneshin/pigeon"
+	"github.com/rossmcdonald/pigeon"
 )
 
 func main() {
