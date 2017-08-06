@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/kaneshin/pigeon/credentials"
+	"github.com/rossmcdonald/pigeon/credentials"
 	"github.com/stretchr/testify/assert"
 )
 
