@@ -153,9 +153,10 @@ func NewAnnotateImageContentRequest(body []byte, ctx *vision.ImageContext, featu
 }
 
 // NewAnnotateImageSourceRequest returns a pointer to a new vision's AnnotateImagesRequest.
-func NewAnnotateImageSourceRequest(source string, features ...*vision.Feature) (*vision.AnnotateImageRequest, error) {
+func NewAnnotateImageSourceRequest(source string, ctx *vision.ImageContext, features ...*vision.Feature) (*vision.AnnotateImageRequest, error) {
 	req := &vision.AnnotateImageRequest{
 		Image:    NewAnnotateImageSource(source),
+		ImageContext: ctx,
 		Features: features,
 	}
 	return req, nil
